@@ -1,0 +1,19 @@
+- type: entity
+  parent: BaseAction
+  id: ActionMonkeyBusiness
+  name: Monkey Business
+  description: OOOK! EEEK! AAAH!
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+    itemIconStyle: NoItem
+    useDelay: 0
+    icon:
+      sprite: Nyanotrasen/Objects/Specific/Species/felinid.rsi
+      state: icon
+  - type: TargetAction
+    interactOnMiss: false
+    range: 10
+  - type: EntityTargetAction
+    canTargetSelf: false
+    event: !type:MonkeyBusinessEvent { }

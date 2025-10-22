@@ -1831,6 +1831,7 @@
         Blunt: 1
     clumsySound:
       path: /Audio/Animals/monkey_scream.ogg
+  - type: MonkeyBusiness # Traumastation
 
 - type: entity
   name: monkey
@@ -3608,7 +3609,7 @@
     factions:
     - Syndicate
   - type: Access
-    tags: 
+    tags:
     - NuclearOperative
     - SyndicateAgent
   - type: MeleeWeapon
