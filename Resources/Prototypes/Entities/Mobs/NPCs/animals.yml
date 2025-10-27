@@ -1832,6 +1832,10 @@
     clumsySound:
       path: /Audio/Animals/monkey_scream.ogg
   - type: MonkeyBusiness # Traumastation
+    cooldown: 5
+    hungerUsage float: 30
+    monkeyBusinessSound SoundSpecifier:
+      path: /Audio/Animals/monkey_scream.ogg
 
 - type: entity
   name: monkey

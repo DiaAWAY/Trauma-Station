@@ -1,3 +1,4 @@
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -18,4 +19,14 @@ public sealed partial class MonkeyBusinessComponent : Component
 
     [DataField]
     public EntityUid MonkeyBusinessTarget;
+
+    [DataField]
+    public float Cooldown;
+
+    [DataField]
+    public float HungerUsage;
+
+    [DataField]
+    public SoundSpecifier MonkeyBusinessSound;
+
 }

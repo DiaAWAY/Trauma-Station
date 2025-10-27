@@ -1,5 +1,7 @@
 
 using Content.Shared.Actions;
+using Content.Shared.Nutrition.Components;
+using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
 using Content.Trauma.Shared.Animals.Monkey.Components;
 
@@ -11,6 +13,7 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly HungerSystem _hunger = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -37,9 +40,19 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
         _actions.RemoveAction(ent.Owner, ent.Comp.ActionEnt);
     }
 
-    private bool CanDoMonkeyBusiness(MonkeyBusinessComponent comp)
+    private bool TryDoMonkeyBusiness(EntityUid uid, MonkeyBusinessComponent comp)
     {
-        // TODO: add some kind of resource (nutrients) or cooldown on monkey business
+        if (TryComp<HungerComponent>(uid, out var hunger))
+        {
+            if (_hunger.GetHunger(hunger) < comp.HungerUsage)
+            {
+                _popup.PopupEntity("Ain't nothing in the ''tank''!", uid, uid);
+                return false;
+            }
+
+            _hunger.ModifyHunger(uid, -comp.HungerUsage, hunger);
+        }
+
         return true;
     }
 
@@ -48,11 +61,10 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
         if (args.Handled)
             return;
 
-
         var target = args.Target;
         var user = args.Performer;
 
-        if (!CanDoMonkeyBusiness(ent))
+        if (!TryDoMonkeyBusiness(user, ent.Comp))
             return;
 
         // var targetCoords = _transform.GetWorldPosition(target);
