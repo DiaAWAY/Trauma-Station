@@ -1,8 +1,11 @@
 
+using System.Numerics;
 using Content.Shared.Actions;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
+using Content.Shared.Throwing;
+using Content.Shared.Weapons.Ranged.Systems;
 using Content.Trauma.Shared.Animals.Monkey.Components;
 
 namespace Content.Trauma.Shared.Animals.Monkey.System;
@@ -14,6 +17,8 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
+    [Dependency] private readonly SharedGunSystem _gunSystem = default!;
+    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -64,15 +69,32 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
         var target = args.Target;
         var user = args.Performer;
 
-        if (!TryDoMonkeyBusiness(user, ent.Comp))
+        var targetPos = _transform.GetMapCoordinates(target).Position;
+        var userPos = _transform.GetMapCoordinates(user).Position;
+
+        var direction = targetPos - userPos;
+        if (direction == Vector2.Zero)
             return;
 
-        // var targetCoords = _transform.GetWorldPosition(target);
+        if (!TryDoMonkeyBusiness(user, ent.Comp))
+            return;
 
         ent.Comp.MonkeyBusinessTarget = target;
 
         _popup.PopupEntity("MONKEY BUSINESS!", user, PopupType.LargeCaution);
         _popup.PopupEntity("WATCH OUT", target, PopupType.LargeCaution);
+
+// PredictedSpawnAtPosition()
+
+//         _gunSystem.ShootProjectile(
+//             user,
+//             direction,
+//             direction.Normalized(),
+// e           ent.Comp.
+//             ent.Comp.MonkeyBusinessRange);
+_throwingSystem.TryThrow(
+
+)
 
         args.Handled = true;
     }
