@@ -1,4 +1,3 @@
-
 using Content.Trauma.Shared.Animals.Monkey.System;
 
 namespace Content.Trauma.Server.Animas.Monkey.Systems;

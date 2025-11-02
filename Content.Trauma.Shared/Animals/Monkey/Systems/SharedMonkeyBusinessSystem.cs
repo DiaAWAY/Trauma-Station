@@ -1,6 +1,7 @@
 
 using System.Numerics;
 using Content.Shared.Actions;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
@@ -19,6 +20,7 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
     [Dependency] private readonly HungerSystem _hunger = default!;
     [Dependency] private readonly SharedGunSystem _gunSystem = default!;
     [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
+    [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -81,20 +83,24 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
 
         ent.Comp.MonkeyBusinessTarget = target;
 
+        // TODO: scream instead of popup
         _popup.PopupEntity("MONKEY BUSINESS!", user, PopupType.LargeCaution);
         _popup.PopupEntity("WATCH OUT", target, PopupType.LargeCaution);
 
-// PredictedSpawnAtPosition()
+        var hairball = EntityManager.SpawnEntity(ent.Comp.HairballPrototype, Transform(user).Coordinates);
+        var hairballComp = Comp<ShitballComponent>(hairball);
 
-//         _gunSystem.ShootProjectile(
-//             user,
-//             direction,
-//             direction.Normalized(),
-// e           ent.Comp.
-//             ent.Comp.MonkeyBusinessRange);
-_throwingSystem.TryThrow(
+        _handsSystem.TryPickupAnyHand(user, hairball);
 
-)
+        // PredictedSpawnAtPosition()
+
+        //         _gunSystem.ShootProjectile(
+        //             user,
+        //             direction,
+        //             direction.Normalized(),
+        // e           ent.Comp.
+        //             ent.Comp.MonkeyBusinessRange);
+
 
         args.Handled = true;
     }

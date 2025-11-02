@@ -10,6 +10,26 @@ namespace Content.Trauma.Shared.Animals.Monkey.Components;
 [RegisterComponent]
 public sealed partial class MonkeyBusinessComponent : Component
 {
+    /**
+        /// <summary>
+        /// The hairball prototype to use.
+        /// </summary>
+        [DataField("hairballPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+        public string HairballPrototype = "Hairball";
+
+        //[DataField("hairballAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+        //public string HairballAction = "ActionHairball";
+
+        [DataField("hairballActionId",
+            customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+        public string? HairballActionId = "ActionHairball";
+
+        [DataField("hairballAction")]
+        public EntityUid? HairballAction;
+    */
+
+    [DataField("hairballPrototypue")]
+    public string HairballPrototype = "Hairball";
 
     [DataField]
     public EntProtoId ActionId = "ActionMonkeyBusiness";
@@ -27,6 +47,6 @@ public sealed partial class MonkeyBusinessComponent : Component
     public float HungerUsage;
 
     [DataField]
-    public SoundSpecifier MonkeyBusinessSound;
+    public SoundSpecifier? MonkeyBusinessSound;
 
 }
