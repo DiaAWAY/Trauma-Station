@@ -1833,8 +1833,8 @@
       path: /Audio/Animals/monkey_scream.ogg
   - type: MonkeyBusiness # Traumastation
     cooldown: 5
-    hungerUsage float: 30
-    monkeyBusinessSound SoundSpecifier:
+    hungerUsage: 3
+    monkeyBusinessSound:
       path: /Audio/Animals/monkey_scream.ogg
 
 - type: entity

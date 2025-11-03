@@ -1,6 +1,9 @@
 
 using System.Numerics;
 using Content.Shared.Actions;
+using Content.Shared.Chat;
+using Content.Shared.Emoting;
+using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
@@ -18,9 +21,14 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly HungerSystem _hunger = default!;
-    [Dependency] private readonly SharedGunSystem _gunSystem = default!;
-    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
+    [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
+    [Dependency] private readonly SharedChatSystem _chatSystem = default!;
+
+    // [Dependency] private readonly EmoteSystem _emoteSystem = default!;
+    // [Dependency] private readonly ChatManager _chatManager = default!;
+    // [Dependency] private readonly SharedGunSystem _gunSystem = default!;
+    // [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -29,6 +37,12 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
         base.Initialize();
 
         _sawmill = Logger.GetSawmill("SharedMonkeySystem");
+        /** // TODO:
+            we really want this to be a do after and such, so we should add a TryDoMonkeyBusiness
+            event for starting doing monkey business, which then should result in the
+            MonkeyBusinessEvent if it completes successfully.
+        */
+        // TODO: figure out how this system should be split between server\shared\client.
 
         SubscribeLocalEvent<MonkeyBusinessComponent, MonkeyBusinessEvent>(DoMonkeyBusiness);
         SubscribeLocalEvent<MonkeyBusinessComponent, MapInitEvent>(OnStartup);
@@ -71,6 +85,13 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
         var target = args.Target;
         var user = args.Performer;
 
+        _handsSystem.TryGetEmptyHand(user, out var emptyHand);
+        if (emptyHand is null)
+        {
+            _popup.PopupEntity("You need a free hand to do monkey business!", user, user);
+            return;
+        }
+
         var targetPos = _transform.GetMapCoordinates(target).Position;
         var userPos = _transform.GetMapCoordinates(user).Position;
 
@@ -83,24 +104,27 @@ public abstract class SharedMonkeyBusinessSystem : EntitySystem
 
         ent.Comp.MonkeyBusinessTarget = target;
 
-        // TODO: scream instead of popup
-        _popup.PopupEntity("MONKEY BUSINESS!", user, PopupType.LargeCaution);
-        _popup.PopupEntity("WATCH OUT", target, PopupType.LargeCaution);
+        // Gonna assume that our hands are still empty and spawn the monkeyball and pick it up
 
-        var hairball = EntityManager.SpawnEntity(ent.Comp.HairballPrototype, Transform(user).Coordinates);
-        var hairballComp = Comp<ShitballComponent>(hairball);
+        var monkeyball = EntityManager.SpawnEntity(ent.Comp.HairballPrototype, Transform(user).Coordinates);
+        _sawmill.Debug("Trying to pick up monkey business: {Monkeyball} with {EmptyHand}", monkeyball, emptyHand);
 
-        _handsSystem.TryPickupAnyHand(user, hairball);
+        var pickedUpMonkeyBusiness = _handsSystem.TryPickup(user, monkeyball, emptyHand);
+        if (pickedUpMonkeyBusiness is false)
+        {
+            // TODO: figure out why we sometimes cannot pick up the monkeyball after spawning it.
+            _sawmill.Debug("Failed to pick up monkey business: {Monkeyball}", monkeyball);
+            EntityManager.DeleteEntity(monkeyball);
+            return;
+        }
+        _sawmill.Debug("Picked up monkey business: {PickedUpMonkeyBusiness}", pickedUpMonkeyBusiness);
 
-        // PredictedSpawnAtPosition()
+        // Business in hand, we now shall inflict our wrath upon the populace.
 
-        //         _gunSystem.ShootProjectile(
-        //             user,
-        //             direction,
-        //             direction.Normalized(),
-        // e           ent.Comp.
-        //             ent.Comp.MonkeyBusinessRange);
-
+        // TODO: using chat system like this feels weird, figure out how this actually should be done.
+        _chatSystem.TrySendInGameICMessage(user, "EEEK OOOK AAAAH!!!!", InGameICChatType.Emote, false);
+        // TODO: figure out if we're trying to throw this too fast after picking it up.
+        // _throwingSystem.TryThrow(monkeyball, direction);
 
         args.Handled = true;
     }

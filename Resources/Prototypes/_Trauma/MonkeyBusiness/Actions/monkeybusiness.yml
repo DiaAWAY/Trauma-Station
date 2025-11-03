@@ -17,3 +17,11 @@
   - type: EntityTargetAction
     canTargetSelf: false
     event: !type:MonkeyBusinessEvent { }
+
+- type: entity
+  parent: Hairball
+  id: MonkeyBusinessBall
+  name: Ball of monkey business
+  description: A disgusting ball of hair and monkey business.
+  components:
+  - type: CreamPie

@@ -28,8 +28,8 @@ public sealed partial class MonkeyBusinessComponent : Component
         public EntityUid? HairballAction;
     */
 
-    [DataField("hairballPrototypue")]
-    public string HairballPrototype = "Hairball";
+    [DataField("hairballPrototype")]
+    public string HairballPrototype = "MonkeyBusinessBall";
 
     [DataField]
     public EntProtoId ActionId = "ActionMonkeyBusiness";
